@@ -206,7 +206,10 @@ void showButtons() {
   String srt = "Sort List";
   float resetX1, resetX2, wallX1, wallX2, rodentX1, rodentX2, birdX1, birdX2;
   float buttonY1, buttonY2;
-  //Button Positions (X1, Y1) and (X2, Y2) 
+  // highlight buttons
+  for(int i = 0; i < just.length; i++) { just[i].highlight(); }
+  
+ //Button Positions (X1, Y1) and (X2, Y2) 
   resetX1 = width*4/100;      resetX2 = width*20/100;     // Reset button x1, x2
   wallX1 = width*21/100;      wallX2 = width*37/100;      //  wall button x1, x2
   rodentX1 = width*38/100;    rodentX2 = width*54/100;    // rodent button x1, x2
@@ -222,10 +225,10 @@ void showButtons() {
   //wallButton.show();
   //ratButton.show();
  // birdButton.show();
- // button color and button text
+ // button color and button text 
  just[0].c = color(100, 200, 100);    just[0].z = clear;
  just[1].c = color(150, 0, 255);      just[1].z = toggle;  
- just[2].c = color(150);              just[2].z = rodent;
+ just[2].c = color(150, 150, 150);              just[2].z = rodent;
  just[3].c = color(255, 0, 0);        just[3].z = bombs;
  just[4].c = color(255, 255, 0);      just[4].z = closest;
  just[5].c = color(255, 200, 100);    just[5].z = list;
@@ -290,7 +293,7 @@ void mousePressed(){
     }
   if(mouseButton == LEFT &&  // button to show listXY
     mouseX > just[5].x1 && mouseX < just[5].x2 &&
-    mouseY > just[5].y1 && mouseY < just[5].y2) {showListXY = !showListXY;}
+    mouseY > just[5].y1 && mouseY < just[5].y2) { showListXY = !showListXY;}
 }
 
 // Ball class
@@ -374,6 +377,7 @@ class Button {
   float x1, y1, x2, y2;  // used for position
   color c;               // used for color, each button can have a different color
   float r, g, b;
+  float hi; // highlight for buttons
   String z;              // used for button text, each button can have different text
   //Button constructor
   Button(float tempX1, float tempY1, float tempX2, float tempY2, color tempC, String tempZ) {
@@ -384,14 +388,26 @@ class Button {
   // shows button
   void show() {
     rectMode(CORNERS);
-    fill(c);
+    fill(c, hi);
     rect(x1, y1, x2, y2);
     fill(0);                      // button text is black
     textSize(15);
     text(z, x1 + 35, y1, x2, y2);
     textSize(12);
   }
+  // highlight a button when the mouse pointer is over it
+  void highlight(){
+    for(int i = 0; i < just.length; i++){
+      if(mouseX > just[i].x1 && mouseX < just[i].x2 &&
+         mouseY > just[i].y1 && mouseY < just[i].y2){
+          just[i].hi = 255;
+         }else{
+           just[i].hi = 200;
+         }
+    }
 }
+}
+
 
 // pool table class
 class Pool {
