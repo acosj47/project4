@@ -13,6 +13,9 @@ boolean showListXY;
 Cloud[] nimbus;                          //Array of clouds called nimbus
 Ball[] acos;
 Button[] just;
+float [] ballX, ballY, distance;
+int [] ballNumber;
+
 // Objects
 Pool table;     // pool table object
 
@@ -25,6 +28,7 @@ Bird eagle;    // Bird object
 void setup() {
   size(1200, 900); 
   reset();
+  listArray();
   // button array
   just = new Button[7];
   float buttonX1 = width*4/100, buttonY1 = height*6/100; 
@@ -64,7 +68,36 @@ void reset() {
   for(int i = 1; i < acos.length; i++){
     acos[i] = new Ball(i);
   }
+}
+// holds arrays for lists - ball x and y, distance from cue
+void listArray(){
+  // array for ball x & y coordinates
+  ballX = new float [15];
+  ballY = new float [15];
+  ballNumber = new int [15];
+  for(int i = 1; i < acos.length; i++){
+    for(int j = i - 1; j < ballX.length; j++){
+      for(int k = i - 1; k < ballNumber.length; k++){
+      ballX[j] = acos[i].x;
+      ballY[j] = acos[i].y;
+      ballNumber[k] = acos[i].number;
+    }
+    }
+  }
+  // array filled with distance from cue
+  distance= new float [15];
+  for(int i = 1; i < acos.length; i++){
+    for(int j = i -1; j < distance.length; j++){
+      distance[j]= dist(acos[0].cueX, acos[0].cueY, acos[i].x, acos[i].y);
+    }
+  }
   
+  
+  //ballY = new float [15];
+  //for(int i = 1; i < acos.length; i++){
+    //for(int j = i -1; j < ballY.length; j++){
+     // ballY[j] = acos[i]
+      
   
 }
 
@@ -77,7 +110,29 @@ void draw() {
   info();
   showButtons();
   listXY();
+  //showNumbers(ballNumber, ballNumber.length, width/2 +50, top + 50);
+  //showList(ballX, ballX.length, width/2 + 100, top + 50);
+  //showList(ballY, ballY.length, width/2 + 200, top + 50);
+  //showList(distance, distance.length, width/2 + 300, top + 50);
+  
 }
+// show lists
+void showList(float a[], int m, float x, float y){
+  for(int i = 0; i < m; i++){
+    fill(0);
+    text(a[i], x, y);
+    y += 30;
+  }
+  
+}
+void showNumbers(int a[], int m, float x, float y){
+  for(int i = 0; i < m; i++){
+    fill(0);
+    text(a[i], x, y);
+    y += 30;
+  }
+}
+
 
 // Shows the scene, table, grass, clouds, rat and bird
 void scene() {
@@ -170,28 +225,20 @@ void listXY(){
  // column lables
  fill(255);
  text("#", w-100, h-60);
- text("X", w, h-60);
- text("Y", w + 100, h-60);
- text("Distance from Cue", w + 200, h-60);
+ text("X", w - 50, h-60);
+ text("Y", w + 50, h-60);
+ text("Distance from Cue", w + 150, h-60);
  
  // text that displays cue x and y
  fill(0);
  text(0, w-100, h -30);
- text(cx, w, h-30);
- text(cy, w + 100, h-30);
+ text(cx, w-50, h-30);
+ text(cy, w + 50, h-30);
  
- // list of x, y and distance from cue 
- for( int i = 1; i < acos.length; i++){
- float d= dist(acos[0].cueX, acos[0].cueY, acos[i].x, acos[i].y); // distance of cue
- float x = acos[i].x;  // x of the balls
- float y = acos[i].y;  // y of the balls
- // list of ball x, y and thier distance from cue 
-  text(i, w-100, h);   // ball number
-  text(x, w, h);       // ball x
-  text(y, w + 100, h); // ball y
-  text(d, w + 200, h); // distance from cue
-   h += 30; // spacing
- }
+  showNumbers(ballNumber, ballNumber.length, width/2 +50, top + 50);
+  showList(ballX, ballX.length, width/2 + 100, top + 50);
+  showList(ballY, ballY.length, width/2 + 200, top + 50);
+  showList(distance, distance.length, width/2 + 300, top + 50);
 }
 }
 // shows buttons and their text
@@ -293,7 +340,11 @@ void mousePressed(){
     }
   if(mouseButton == LEFT &&  // button to show listXY
     mouseX > just[5].x1 && mouseX < just[5].x2 &&
-    mouseY > just[5].y1 && mouseY < just[5].y2) { showListXY = !showListXY;}
+    mouseY > just[5].y1 && mouseY < just[5].y2) {
+    listArray();
+    showListXY = true;
+  
+}
 }
 
 // Ball class
@@ -407,6 +458,8 @@ class Button {
     }
 }
 }
+
+
 
 
 // pool table class
