@@ -290,7 +290,7 @@ void showButtons() {
 // Displays name, info, and score
 void info() {
   String name = "Justin Acosta";                                      // My name
-  String title = "Project 3  CST 112 EVE";                           // Title 
+  String title = "Project 4  CST 112 EVE";                           // Title 
   String click= "click a ball to reset its position!";              // click ball text
   String press= "press key 1, 2, 3 or 4 to reset respective ball!";// key 1,2,3 text
 
