@@ -9,7 +9,7 @@ int score;                               // integer for the games score
 int count = 0;                           // count for animation
 boolean wall, rat, bird;                 // on and off for wall, rat and bird. Defined in reset()
 boolean cue;                             // controlls cue ball movement. Defined in reset()
-boolean showListXY;
+boolean showListXY, showClosest;
 Cloud[] nimbus;                          //Array of clouds called nimbus
 Ball[] acos;
 Button[] just;
@@ -48,6 +48,7 @@ void setup() {
 
 void reset() {
   score = 0;
+  showClosest = false;
   showListXY = false;
   wall = true;              // wall exists on start and reset
   rat = false;              // rat does not start on screen
@@ -110,12 +111,47 @@ void draw() {
   info();
   showButtons();
   listXY();
+  display();
+  //closeCue(distance, distance.length);
   //showNumbers(ballNumber, ballNumber.length, width/2 +50, top + 50);
   //showList(ballX, ballX.length, width/2 + 100, top + 50);
   //showList(ballY, ballY.length, width/2 + 200, top + 50);
   //showList(distance, distance.length, width/2 + 300, top + 50);
   
 }
+void display(){
+  if(showClosest == true){
+  fill(0);
+  rect(width/2-450, top - 60, width/2-90, top);
+ int ballNumber;
+ ballNumber = closeCue(distance, distance.length);
+  fill(acos[ballNumber].r, acos[ballNumber].g, acos[ballNumber].b );
+  textSize(20);
+  text("The ball closest to the Cue is " +ballNumber, width/2 - 400, top - 20);
+  textSize(12);
+  acos[ballNumber].ring();
+  }
+}
+
+// find the shortest distance in the distance array,  its and ball #
+  int  closeCue(float a[], int m){
+  float close; // the shorest value
+  int ballNumber = 0;   // ball # cloeset to cue
+  close = a[0];
+  for(int i = 0; i < m; i++){
+    if(a[i] <= close) {    // Note!!- if you only put <, you wont get ball # 1
+      close= a[i];
+      ballNumber = i + 1; // the # of the ball with the shortest distance
+    }
+  }
+  
+  //text(close, width/2 - 200, height/2);
+  //text(whereClose, width/2 - 250, height/2);
+  return ballNumber;
+}
+
+
+
 // show lists
 void showList(float a[], int m, float x, float y){
   for(int i = 0; i < m; i++){
@@ -151,9 +187,11 @@ void scene() {
 void balls(){
  acos[0].showCue(); 
  acos[0].moveCue();
+ acos[0].bounceCue();
  for(int i = 1; i < acos.length; i++){
    acos[i].show();
    acos[i].move();
+   acos[i].bounce();
  }
 }
 // contains all collison checks for cueball, balls and rat
@@ -275,7 +313,7 @@ void showButtons() {
  // button color and button text 
  just[0].c = color(100, 200, 100);    just[0].z = clear;
  just[1].c = color(150, 0, 255);      just[1].z = toggle;  
- just[2].c = color(150, 150, 150);              just[2].z = rodent;
+ just[2].c = color(150, 150, 150);    just[2].z = rodent;
  just[3].c = color(255, 0, 0);        just[3].z = bombs;
  just[4].c = color(255, 255, 0);      just[4].z = closest;
  just[5].c = color(255, 200, 100);    just[5].z = list;
@@ -338,13 +376,21 @@ void mousePressed(){
       eagle.bombDrop();
     }
     }
+    
+  if(mouseButton == LEFT &&
+    mouseX > just[4].x1 && mouseX < just[4].x2 &&
+    mouseY > just[4].y1 && mouseY < just[4].y2) { 
+    listArray();
+    showClosest = true; }
+    
+    
   if(mouseButton == LEFT &&  // button to show listXY
     mouseX > just[5].x1 && mouseX < just[5].x2 &&
     mouseY > just[5].y1 && mouseY < just[5].y2) {
     listArray();
     showListXY = true;
-  
-}
+ }
+
 }
 
 // Ball class
@@ -389,37 +435,69 @@ class Ball {
    fill(255);
    ellipse(cueX, cueY, 30, 30);
   }
+  
+  void ring(){
+   noFill();
+   strokeWeight(6);
+   stroke(255);
+   ellipse(x, y, 60, 60);
+   stroke(0);
+   strokeWeight(0);
+  }
 
-  // Method that moves and bounces balls of walls
+  // Move balls
   void move() {
     x += dx;  
     y += dy;
     
-
+  }
+  // bouce balls of walls
+  void bounce(){
     if (wall) {  // bounce of wall         
       if (x < middle + 35 || x > right - 15)   dx *= -1; 
-      if (y < top + 15 || y > bottom - 15)     dy *= -1;
+      if (y < top + 15 || y > bottom - 15)     dy *= -1; 
     } else {  //bounce off left if wall is gone 
-      if (x < left + 15  || x > right - 15)   dx *= -1;
+      if (x < left + 15  || x > right - 15)   dx *= -1; 
       if (y < top + 15 || y > bottom - 15)    dy *= -1; 
-
-    }
-       
-    
+ }
+ // push balls harder off walls to keep them inside border
+   if (wall) { 
+    if (x < middle + 35 || x > right - 15)  {move(); move(); }
+    if (y < top + 15 || y > bottom - 15)    {move(); move(); }
+  }else{
+    if (x < left + 15  || x > right - 15)   {move(); move();}
+    if (y < top + 15 || y > bottom - 15)    {move(); move();}
+  }
+ // force back to table if they ball breaks border
+    if (wall) { 
+    if (x < middle + 35 || x > right + 15)  {x = random(middle+30, right-30);  }
+    if (y < top - 15 || y > bottom + 15)    {y = random(top+30, bottom-30); }
+  }else{
+    if (x < left - 15  || x > right + 15)   {x = random(middle+30, right-30);}
+    if (y < top - 15 || y > bottom + 15)    {y = random(top+30, bottom-30);}
+  }
     
   }
 
-  //  Method that moves and bounces cueball
+  //  Moves cueball
   void moveCue() {
-    
-    
     if (cue == true) {  // cue is at rest at start. if cue is hit by other balls it moves.
       cueX += cueDX;
       cueY += cueDY;
     }
+  }
+  // bounce cue off walls
+ void bounceCue(){
     if (cueX < left + 15  || cueX > right - 15) {cueDX *= -1;}  // bounce cue ball off walls
     if (cueY < top + 15 || cueY > bottom - 15) {cueDY *= -1;}   // cue ignores wall
-  }
+   // bounce back harder
+    if (cueX < left + 15  || cueX > right - 15)  {moveCue(); moveCue(); }
+    if (cueY < top + 15 || cueY > bottom - 15)  {moveCue(); moveCue(); }
+    // force back to table
+    if (cueX < left - 15  || cueX > right + 15)  {cueX = random(middle+30, right-30);}
+    if (cueY < top - 15 || cueY > bottom + 15)  {cueY = random(top+30, bottom-30); }
+ 
+ }
 }
 
 // button class
@@ -458,9 +536,6 @@ class Button {
     }
 }
 }
-
-
-
 
 // pool table class
 class Pool {
