@@ -546,7 +546,7 @@ class Button {
           mouseY > just[i].y1 && mouseY < just[i].y2) {
          just[i].hi = 255;
       } else {
-         just[i].hi = 200;
+         just[i].hi = 175;
       }
     }
   }
